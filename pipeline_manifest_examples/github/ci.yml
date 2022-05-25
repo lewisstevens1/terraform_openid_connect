@@ -1,0 +1,30 @@
+name: Terraform Pipeline
+
+permissions:
+  id-token: write
+  contents: read
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  github-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.ACCOUNT_ID }}:role/identity_provider_github_assume_role
+          aws-region: $AWS_DEFAULT_REGION
+
+      - name: plan-terraform
+        working-directory: ./
+        run: terraform init && terraform plan -out terraform.tfplan
+
+      - name: apply-terraform
+        working-directory: ./
+        run: terraform apply terraform.tfplan
