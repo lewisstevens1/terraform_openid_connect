@@ -1,2 +1,2 @@
 # terraform_openid_connect
-An example of how to set up OpenID Connect with Terraform, also provides resources for this dev.to post (https://dev.to/aws-builders/creating-a-credential-less-terraform-pipeline-3ipp).
+An example of how to set up OpenID Connect with Terraform, also provides resources for this dev.to post (https://dev.to/aws-builders/creating-a-credential-less-terraform-pipeline-4o3g).
