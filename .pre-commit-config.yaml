@@ -1,0 +1,23 @@
+repos:
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.64.1
+    hooks:
+      # Ensure coding standards are met e.g. snake_case or camelCase. Also comment format.
+      - id: terraform_tflint
+
+      # Ensure that the file formatting is correct.
+      - id: terraform_fmt
+
+      # Static analysis of potential security issues. TFSec also can be an option.
+      - id: checkov
+
+      # Provide automated documentation to the readme file.
+      - id: terraform_docs
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json

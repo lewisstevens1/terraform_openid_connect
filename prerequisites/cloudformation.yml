@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Resources:
+  TfBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      VersioningConfiguration:
+        Status: Enabled
+
+  TfUser:
+    Type: AWS::IAM::User
+    Properties:
+      Policies:
+
+        - PolicyName: PermissionForOpenIdConnectModule
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+
+              - Effect: Allow
+                Action:
+                  - iam:*OpenIDConnectProvider
+                Resource:
+                  - Fn::Sub:
+                      - 'arn:aws:iam::${AccountId}:oidc-provider/*'
+                      - AccountId: !Ref AWS::AccountId
+
+              - Effect: Allow
+                Action:
+                  - iam:*Role*
+                Resource:
+                  - Fn::Sub:
+                      - 'arn:aws:iam::${AccountId}:role/identity-provider-github-assume-role'
+                      - AccountId: !Ref AWS::AccountId
+                  - Fn::Sub:
+                      - 'arn:aws:iam::${AccountId}:role/identity-provider-gitlab-assume-role'
+                      - AccountId: !Ref AWS::AccountId
+                  - Fn::Sub:
+                      - 'arn:aws:iam::${AccountId}:role/identity-provider-bitbucket-assume-role'
+                      - AccountId: !Ref AWS::AccountId
+
+        - PolicyName: PermissionToBucketState
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                Resource:
+                  - !GetAtt TfBucket.Arn
+
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                Resource:
+                  - Fn::Sub:
+                      - "${BucketArn}/*"
+                      - BucketArn: !GetAtt TfBucket.Arn
+
+
+Outputs:
+  BucketName:
+    Description: The name of the state bucket used for Terraform State.
+    Value: !Ref TfBucket
+
+  BucketRegion:
+    Description: The region of the state bucket that will be used for Terraform State.
+    Value: !Ref AWS::Region
