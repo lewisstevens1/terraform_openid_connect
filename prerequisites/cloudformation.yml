@@ -60,6 +60,26 @@ Resources:
                       - "${BucketArn}/*"
                       - BucketArn: !GetAtt TfBucket.Arn
 
+  # Generates the Access Key
+  TfAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      # Increment serial to rotate key
+      Serial: 1
+      Status: Active
+      UserName: !Ref TfUser
+
+  # Adds the Credentials to Secrets Manager
+  TfSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: Credentials for Terraform.
+      Name: TERRAFORM_CREDENTIALS
+      SecretString: !Sub
+        - '{"AWS_ACCESS_KEY_ID":"${AWS_ACCESS_KEY_ID}","AWS_SECRET_ACCESS_KEY":"${AWS_SECRET_ACCESS_KEY}","AWS_DEFAULT_REGION":"${AWS_DEFAULT_REGION}"}'
+        - AWS_ACCESS_KEY_ID: !Ref TfAccessKey
+          AWS_SECRET_ACCESS_KEY: !GetAtt TfAccessKey.SecretAccessKey
+          AWS_DEFAULT_REGION: !Ref "AWS::Region"
 
 Outputs:
   BucketName:
